@@ -1,0 +1,24 @@
+Resumen funcionamiento:
+    - Se inicia el programa, hace udp broadcast buscando chatrooms.
+    - El lider del chatroom responde con la info del chatroom
+    - El programa recibe la info y muestra las distintas chatrooms a las que se puede conectar
+    - Se elige uno y se manda rpc(registrar componente)
+        -> el endpoint se registra en todos los nodos del chatroom
+    - El endpoint ahora es un seguidor del lider y se le entrega un id
+    - Desde cualquier endpoint cuando se quiere mandar un mensaje se llama un rpc del lider
+        que manda el mensaje a todos los miembros
+    - Cuando el mensaje está en todos los nodos activos devuelve exito
+    - El lider (y cada endpoint) guarda un buffer con los últimos 5 mensajes
+    - Si tras 3 intentos de la llamada rpc(recive msg) no consigue que un nodo reciba un mensaje no se lo manda
+    - Si un nodo no responde a 5 llamadas rpc(latido) lo marca como desconectado
+        y manda a todos los seguidores rpc(desconecta(id)) para que lo marquen como fuera
+    - Si un nodo se desconecta manualmente le manda al lider rpc(exit) que mandará a todos
+        rpc(desconecta(id))
+    - Si un nodo no recibe rpc(latido) por parte del lider tras n tiempo inicia proceso de elección
+    - manda rpc(elección(id)) a todos y si nadie le responde con un id menor al suyo es el nuevo lider
+    - el nuevo lider hace rpc(sync) con cada nodo para evitar posibles mensajes perdidos
+
+Nodo:
+    hosts[] -> mapa id -> endpoint
+    lider -> id
+    replyBuffer[]
