@@ -43,15 +43,18 @@ func (me *UDPEndpoint) BroadcastMsg(message []byte) error {
 	return err
 }
 
-func (me *UDPEndpoint) Listen() ([]byte, *net.UDPAddr, error) {
+// Listens for udp messages and calls callback on message received
+func (me *UDPEndpoint) Listen(callback func([]byte, *net.UDPAddr)) {
 	buf := make([]byte, 1024)
 
-	n, remoteAddr, err := me.listener.ReadFromUDP(buf)
-	if err != nil {
-		return nil, nil, err
-	}
+	for {
+		n, remoteAddr, err := me.listener.ReadFromUDP(buf)
+		if err != nil {
+			continue
+		}
 
-	return buf[:n], remoteAddr, nil
+		callback(buf[:n], remoteAddr)
+	}
 }
 
 func (me *UDPEndpoint) Close() {
