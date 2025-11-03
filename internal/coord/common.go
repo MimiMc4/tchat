@@ -9,8 +9,6 @@ import (
 	"github.com/mimimc4/tchat/pkg/utils"
 )
 
-type Empty struct{}
-
 type ChatMessage struct {
 	sender  string
 	message string
