@@ -13,7 +13,6 @@ type UDPEndpoint struct {
 	broadcastConn *net.UDPConn
 }
 
-// Initializes udp endpoint and sets up message listener goroutine
 func (me *UDPEndpoint) Init() error {
 	// Init listener
 	addr := ":" + config.UDPPort
