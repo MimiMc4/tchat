@@ -6,8 +6,9 @@ import (
 	"os"
 )
 
-func CheckError(err error, errMsg string) {
+func CheckError(err error, comment string) {
 	if err != nil {
-		fmt.Fprintln(os.Stderr, errMsg, ":", err)
+		fmt.Fprintf(os.Stderr, "In: %s, Fatal error: %s", comment, err.Error())
+		os.Exit(1)
 	}
 }
