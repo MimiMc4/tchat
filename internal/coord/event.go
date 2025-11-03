@@ -21,3 +21,12 @@ type NodeLeaveEvent struct {
 func (e NodeLeaveEvent) Type() string {
 	return "NodeLeaveEvent"
 }
+
+// NEW MESSAGE EVENT
+type NewMessageEvent struct {
+	message ChatMessage
+}
+
+func (e NewMessageEvent) Type() string {
+	return "NewMessageEvent"
+}

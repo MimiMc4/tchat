@@ -10,34 +10,52 @@ import (
 )
 
 type ChatMessage struct {
-	sender  string
-	message string
-	time    time.Time // use Clock() to get hours, mins and sec
+	Sender  string
+	Message string
+	Time    time.Time // use Clock() to get hours, mins and sec
+}
+
+func Equal(a, b ChatMessage) bool {
+	return a.Sender == b.Sender && a.Time.Equal(b.Time)
 }
 
 type LeaderInfo struct{}
 
 type RemoteNode struct {
-	name     string
-	endpoint network.RPCEndpoint
+	Name     string
+	Endpoint network.RPCEndpoint
+}
+
+type Timeout struct {
+	HeartbeatTimeout chan bool
+	ElectionTimeout  chan bool
 }
 
 type Node struct {
-	mu sync.RWMutex
+	Mu sync.RWMutex
 
-	id        int
-	name      string
-	msgBuffer *utils.CircularBuffer[ChatMessage]
-	endpoints map[int]RemoteNode
-	eventChan chan Event
+	ID        int
+	Name      string
+	IsLeader  bool
+	LeaderID  int
+	MsgBuffer *utils.CircularBuffer[ChatMessage]
+	Endpoints map[int]RemoteNode
+	Timeout   Timeout
+	EventChan chan Event
 }
 
 func NewNode(id int, name string) *Node {
 	return &Node{
-		id:        id,
-		name:      name,
-		msgBuffer: utils.NewCircularBuffer[ChatMessage](config.BuffSize),
-		endpoints: make(map[int]RemoteNode),
-		eventChan: make(chan Event, 64),
+		ID:        id,
+		Name:      name,
+		IsLeader:  false,
+		LeaderID:  -1,
+		MsgBuffer: utils.NewCircularBuffer[ChatMessage](config.BuffSize, Equal),
+		Endpoints: make(map[int]RemoteNode),
+		Timeout: Timeout{
+			HeartbeatTimeout: make(chan bool),
+			ElectionTimeout:  make(chan bool),
+		},
+		EventChan: make(chan Event, 64),
 	}
 }

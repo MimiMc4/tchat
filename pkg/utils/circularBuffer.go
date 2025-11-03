@@ -1,22 +1,26 @@
 package utils
 
-import "sync"
+import (
+	"sync"
+)
 
 type CircularBuffer[T any] struct {
 	mu sync.RWMutex
 
-	data  []T
-	size  int
-	start int
-	count int
+	data   []T
+	size   int
+	start  int
+	count  int
+	eqFunc func(a, b T) bool // function for comparing elements
 }
 
-func NewCircularBuffer[T any](size int) *CircularBuffer[T] {
+func NewCircularBuffer[T any](size int, eqFunc func(a, b T) bool) *CircularBuffer[T] {
 	return &CircularBuffer[T]{
-		data:  make([]T, size),
-		size:  size,
-		start: 0,
-		count: 0,
+		data:   make([]T, size),
+		size:   size,
+		start:  0,
+		count:  0,
+		eqFunc: eqFunc,
 	}
 }
 
@@ -48,6 +52,35 @@ func (b *CircularBuffer[T]) GetAll() []T {
 		result[i] = b.data[idx]
 	}
 	return result
+}
+
+func (b *CircularBuffer[T]) Contains(element T) bool {
+	b.mu.RLock()
+	defer b.mu.RUnlock()
+
+	if b.eqFunc == nil {
+		return false
+	}
+
+	for i := 0; i < b.count; i++ {
+		idx := (b.start + i) % b.size
+		if b.eqFunc(b.data[idx], element) {
+			return true
+		}
+	}
+	return false
+}
+
+func (b *CircularBuffer[T]) Clear() {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	b.start = 0
+	b.count = 0
+	for i := range b.data {
+		var zero T
+		b.data[i] = zero
+	}
 }
 
 func (b *CircularBuffer[T]) Len() int {
