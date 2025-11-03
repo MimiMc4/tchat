@@ -9,7 +9,6 @@ import (
 )
 
 type UDPEndpoint struct {
-	addr          *net.UDPAddr
 	listener      *net.UDPConn
 	broadcastConn *net.UDPConn
 }
@@ -23,7 +22,6 @@ func (me *UDPEndpoint) Init() error {
 	if err != nil {
 		return err
 	}
-	me.addr = UDPAddr
 
 	me.listener, err = net.ListenUDP("udp", UDPAddr)
 	if err != nil {
