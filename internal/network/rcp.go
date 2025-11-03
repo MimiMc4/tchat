@@ -6,7 +6,7 @@ import (
 	"net/rpc"
 	"time"
 
-	"github.com/mimimc4/tchat/pkg/config"
+	"github.com/mimimc4/tchat/internal/config"
 )
 
 type RPCEndpoint string

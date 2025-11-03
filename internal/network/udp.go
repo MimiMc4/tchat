@@ -5,7 +5,7 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/mimimc4/tchat/pkg/config"
+	"github.com/mimimc4/tchat/internal/config"
 )
 
 type UDPEndpoint struct {
