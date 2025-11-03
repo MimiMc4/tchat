@@ -4,4 +4,6 @@ package config
 const (
 	UDPPort string = "30000"
 	TCPPort string = "30001"
+
+	BuffSize = 5
 )

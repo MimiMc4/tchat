@@ -2,7 +2,7 @@ Resumen funcionamiento:
     - Se inicia el programa, hace udp broadcast buscando chatrooms.
     - Cada lider de chatroom responde con llamada RPC(actualizar chatrooms)
     - El programa recibe la info y muestra las distintas chatrooms a las que se puede conectar
-    - Se elige uno y se manda rpc(registrar componente)
+    - Se elige uno y se manda rpc(registrar participante)
         -> el endpoint se registra en todos los nodos del chatroom
     - El endpoint ahora es un seguidor del lider y se le entrega un id
     - Desde cualquier endpoint cuando se quiere mandar un mensaje se llama un rpc del lider
