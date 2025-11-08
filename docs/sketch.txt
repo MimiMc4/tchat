@@ -18,7 +18,3 @@ Resumen funcionamiento:
     - manda rpc(elección(id)) a todos y si nadie le responde con un id menor al suyo es el nuevo lider
     - el nuevo lider hace rpc(sync) con cada nodo para evitar posibles mensajes perdidos
 
-Nodo:
-    hosts[] -> mapa id -> endpoint
-    lider -> id
-    replyBuffer[]

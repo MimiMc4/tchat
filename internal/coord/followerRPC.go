@@ -8,24 +8,27 @@ type Empty struct{}
 
 // ADD PARTICIPANT ====================================================================
 type ArgAddParticipant struct {
-	Id      int
+	ID      int
 	Name    string
 	Enpoint network.RPCEndpoint
 }
 
-func (me *Node) AddParticipant(args *ArgAddParticipant, results *Empty) {
+func (me *Node) AddParticipant(args *ArgAddParticipant, results *Empty) error {
 	me.Mu.Lock()
 	defer me.Mu.Unlock()
 
 	newNode := RemoteNode{
+		ID:       args.ID,
 		Name:     args.Name,
 		Endpoint: args.Enpoint,
 	}
-	me.Endpoints[args.Id] = newNode
+	me.Endpoints[args.ID] = &newNode
 
 	*results = Empty{}
 
 	me.EventChan <- NodeJoinEvent{name: args.Name}
+
+	return nil
 }
 
 // REMOVE PARTICIPANT ====================================================================
@@ -33,7 +36,7 @@ type ArgRemoveParticipant struct {
 	ID int
 }
 
-func (me *Node) RemoveParticipant(args *ArgRemoveParticipant, results *Empty) {
+func (me *Node) RemoveParticipant(args *ArgRemoveParticipant, results *Empty) error {
 	me.Mu.Lock()
 	defer me.Mu.Unlock()
 
@@ -46,6 +49,8 @@ func (me *Node) RemoveParticipant(args *ArgRemoveParticipant, results *Empty) {
 	*results = Empty{}
 
 	me.EventChan <- leaveEvent
+
+	return nil
 }
 
 // RECEIVE MESSAGE ====================================================================
@@ -53,7 +58,7 @@ type ArgReceiveMessage struct {
 	Message ChatMessage
 }
 
-func (me *Node) ReceiveMessage(args *ArgReceiveMessage, results *Empty) {
+func (me *Node) ReceiveMessage(args *ArgReceiveMessage, results *Empty) error {
 	me.Mu.Lock()
 	defer me.Mu.Unlock()
 
@@ -62,13 +67,17 @@ func (me *Node) ReceiveMessage(args *ArgReceiveMessage, results *Empty) {
 	*results = Empty{}
 
 	me.EventChan <- NewMessageEvent{message: args.Message}
+
+	return nil
 }
 
 // RECEIVE HEARTBEAT ====================================================================
-func (me *Node) ReceiveHeartbeat(args *Empty, results *Empty) {
+func (me *Node) ReceiveHeartbeat(args *Empty, results *Empty) error {
 	me.Timeout.HeartbeatTimeout <- true
 
 	*results = Empty{}
+
+	return nil
 }
 
 // ELECTION ====================================================================
@@ -80,7 +89,7 @@ type ResultElection struct {
 	Vote bool
 }
 
-func (me *Node) Election(args *ArgElection, results *ResultElection) {
+func (me *Node) Election(args *ArgElection, results *ResultElection) error {
 	me.Mu.Lock()
 	defer me.Mu.Unlock()
 
@@ -102,6 +111,8 @@ func (me *Node) Election(args *ArgElection, results *ResultElection) {
 	}
 
 	*results = vote
+
+	return nil
 }
 
 // SYNC ====================================================================
@@ -109,7 +120,7 @@ type ArgSync struct {
 	messages []ChatMessage
 }
 
-func (me *Node) Sync(args *ArgSync, results *Empty) {
+func (me *Node) Sync(args *ArgSync, results *Empty) error {
 	me.Mu.Lock()
 	defer me.Mu.Unlock()
 
@@ -121,4 +132,6 @@ func (me *Node) Sync(args *ArgSync, results *Empty) {
 			me.EventChan <- NewMessageEvent{message: message}
 		}
 	}
+
+	return nil
 }
